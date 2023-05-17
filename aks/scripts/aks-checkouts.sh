@@ -55,7 +55,7 @@ while read -r pod; do
     pod_name=$(echo "$pod" | awk '{print $2}')
 
     echo "Checking pod: $pod_namespace/$pod_name"
-    # Get the Node Status and Events for the pod
+    # Get the Node through Status for the pod
     node_status=$(kubectl describe pod "$pod_name" \
         --namespace "$pod_namespace" | awk '/Node:/,/Status:/')
     echo "$node_status"
