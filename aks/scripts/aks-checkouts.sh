@@ -23,26 +23,32 @@ echo "########################################################"
 
 # Check the control plane version and available upgrade
 az aks get-upgrades --resource-group "$resource_group" \
-    --name "$cluster_name" --output table
+    --name "$cluster_name" -o table
 echo "########################################################"
 
 # Check AKS cluster status
 az aks show --resource-group "$resource_group" \
-    --name "$cluster_name" --output table
+    --name "$cluster_name" -o table
 echo "########################################################"
 
 # List node pools
 az aks nodepool list --resource-group "$resource_group"  \
-    --cluster-name "$cluster_name" --output table
+    --cluster-name "$cluster_name" -o table
 echo "########################################################"
 
 # Check cluster nodes
 kubectl get nodes
 echo "########################################################"
 
+# Display custom columns for pods with node, pod, namespace, status, and age
+kubectl get pods --all-namespaces \
+    -o custom-columns='NODE:spec.nodeName,POD:metadata.name,NAMESPACE:metadata.namespace,STATUS:status.phase,AGE:metadata.creationTimestamp' \
+    | sort -k1,1 -k2
+echo "########################################################"
+
 # Get all pods in the cluster
 pods=$(kubectl get pods --all-namespaces \
-    --output=jsonpath="{range .items[*]}{.metadata.namespace} {.metadata.name}{'\n'}{end}")
+    -o jsonpath="{range .items[*]}{.metadata.namespace} {.metadata.name}{'\n'}{end}")
 
 # Count the total number of pods
 total_pods=$(echo "$pods" | wc -l)
